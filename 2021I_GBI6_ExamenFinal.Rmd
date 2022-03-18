@@ -92,7 +92,7 @@ head(df,5)
 ### [1 PUNTO] 1.3 Cree una función de nombre ```long_df``` para transformar la data ```df``` de la forma wide a long.
 
 ```{r funcion_long}
-```
+
 #Instalar  paquete
 #install.packages("tidyr")
 #La libreria tidyr para cargar melt
@@ -109,7 +109,7 @@ long_df <- function(df){
 ### [1 PUNTO] 1.4 Genere la data ```df_long``` utilizandola función ```long_df```. 
 La tabla resultante tendrá tres columnas: ```dataset, gen, expresion_level```.  
 ```{r df_long}
-```
+
 # Genere  data df_long 
 # data anterior posee 4 columnas: bcr_patient_barcode, dataset, gen y expresion_level
 # Ultimos 3 elementos que son los de interes
@@ -121,7 +121,7 @@ head(df_long,5)
 
 ### [0.5 PUNTOS] 1.5 A partir de la data ```df_long```, genere un **Descriptive table** (librería ```sjPlot```) y guárdelo en el subdirectorio "result"  con el nombre **mRNA_expr_summary.doc** (previamente debe seleccionar las celdas adecuadas con funciones de la librería ```dplyr``` en conjunto con el operador ```%>%```). 
 ```{r desc_table}
-```
+
 #código para crear el Descriptive table 
 #Librerias : dplyr 1.0.8, sjplot 2.8.10
 library(dplyr)
@@ -133,7 +133,7 @@ descriptive_table0 <- df_long %>% group_by(dataset,
 #Descripcion de la data
 descriptive_tablef <- descr(x=descriptive_table0, 
                             out="browser",
-                            file="results/mRNA_expr_summary.doc")
+                            file="result/mRNA_expr_summary.doc")
 descriptive_tablef
 ```
 
@@ -162,7 +162,7 @@ descriptive_tablef
 ### [1 PUNTO] 2.1 Cree la funcion ```tcga_boxplots``` para visualizar boxplots y jitterplots. El único parámetro de la función es ```dataset```. La función debe crear un boxplot de los niveles de expresión para cada gen.
 
 ```{r}
-```
+
 # Código para crear  tcga_boxplots
 #Instalar  paquete
 #install.packages("ggplot2")
@@ -183,7 +183,7 @@ tcga_boxplots <- function(data){
 
 ### [0.5 PUNTOS] 2.2 Utilizando la función ```lapply()``` genera la lista ```cancertype_boxplots``` con las gráficas para cada tipo de cancer (cada tipo de dataset). 
 ```{r list_boxplots}
-```
+
 # Código para generar la lista. 
 #Hacer una lista  para cada dataset y
 #Asiganar  un valor de un grafico
@@ -197,13 +197,13 @@ cancertype_boxplots
 
 ### [0.5 PUNTOS] 2.3 Guarde en el subdirectorio ```result``` el tercer plot de la lista ```cancertype_boxplots``` con el nombre ```boxplot3.png```. La definición de a figura debe ser de 300dpi. 
 ```{r boxplot3}
-```
+
 # Código para guardar la tercera figura de la lista. 
 #Se elije el tercer grafico
 cancertype_boxplots_value <- cancertype_boxplots[[3]]
 cancertype_boxplots_value
 # Almacena
-ggsave("results/boxplot3.png",
+ggsave("result/boxplot3.png",
        dpi = 300,
        limitsize = TRUE,)
 ```
@@ -248,7 +248,7 @@ reg_gen_expression <- function(cancertype_boxplots_value){
 
 ### [0.5 PUNTOS] 2.5. Utilizando la función ```lapply()``` genera la lista ```reg_genplots``` con las gráficas para cada par de genes posibles. Recuerde que tiene 7 tipos de genes, se debe tener todas las combinaciones posibles por pares de genes (combinatoria sin repetición).
 ```{r list_regplots}
-```
+
 # Código para generar la lista. 
 #Se hacen elementos unicos, para los genes
 #Se usa  codigo similar al anterior para ver combinaciones
@@ -266,13 +266,13 @@ reg_genplots
 
 ### [0.5 PUNTOS] 2.6. Guarde en el subdirectorio ```result``` el onceavo plot de la lista ```reg_genplots``` con el nombre ```regresion11.pdf```. La definición de a figura debe ser de 300dpi. 
 ```{r reg11}
-```
+
 # Codigo para guardar el onceavo plot. 
 #Se elije el onceavo grafico
 reg_genplots_value <-reg_genplots[[11]]
 reg_genplots_value
 #Almacena y guarda
-ggsave("results/regresion11.pdf",
+ggsave("result/regresion11.pdf",
        dpi = 300,
        limitsize = TRUE,)
 ```
