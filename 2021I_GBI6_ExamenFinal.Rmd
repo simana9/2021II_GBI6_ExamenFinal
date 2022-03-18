@@ -1,0 +1,294 @@
+---
+title: "GBI6 - BIOINFORMÁTICA"
+subtitle: "EXAMEN FINAL"
+author: 'Silvana Morocho'
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: espresso
+    theme: paper
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+![](./img/ikiam.png)
+
+**Bienvenidos al examen final de GBI6 - Bioinformática.**
+
+# CONTENIDO DE LA EVALUACIÓN
+
+Los contenidos de esta evaluación corresponden a los temas de R revisados en el curso:
+
+-   Tipos de datos
+
+-   Instalación y uso de librerías. 
+
+-   Estructuras de control
+
+-   Funciones
+
+-   Manipulación de datos
+
+-   Estadística básica
+
+-   Visualización de datos
+
+# INDICACIONES GENERALES
+
+Esta permitido consultar todo material disponible: diapositivas, google...Sin embargo **NO** esta permitido consultar a sus colegas.
+
+Ustedes estan utilizando el R Markdown. Las instruciones son:
+
+-   Creen una carpeta en su computador con el nombre "GBI6_ExamenFinal" donde guarden este cuaderno .Rmd. 
+
+- Cree un subdirectorio de nombre "data" donde guarde la data que van a utilizar.
+
+- Cree un subdirectorio de nombre "results" donde guarde la tablas y figuras generadas del análisis.
+
+-   Definan a esa carpeta como su directorio de trabajo.
+
+-   Arriba, **solamente** donde dice "author", deben llenar sus nombres.
+
+-   Los codigos deben ser escritos dentro de las cajas que inician y terminan con \`\`\` o dentro de las cajas indicadas abajo de las preguntas.
+
+-   Al final del examen deben utilizar el comando "Knit" para generar un archivo .html
+
+-   Es recomendable crear una copia de este script guía.
+
+-   Genere controles de la versión para cada una de las preguntas con la leyenda "Nombre Apellido, resuelve el ejercicio XX". 
+
+- Copie y peque la dirección de su repositorio de GitHub en la actividad **"ExamenFinal"**.
+
+-   Asegúrese de responder explícitamente cada una de las preguntas.
+
+Para comprender la data de esta evaluación se requiere conocer el significado de algunos acrónimos de los tipos de cancer como indica el [Broad Institute Cancer Names](https://gdac.broadinstitute.org/). Asimismo revise la información de ayuda para ```expresionsTCGA```. La data contiene las columnas: 
+
+- **bcr_patient_barcode**: identificador del paciente. 
+
+- **dataset**:  identificador del tipo de cancer del paciente. 
+
+- **resto de columnas**: nivees de expresión de los diferentes mRNA de los genes que están como nombre de columna (para este análisis se han seleccionado solamente 7 de ellos). 
+
+# PREGUNTAS
+## **Pregunta 1: MANIPULACIÓN DE DATOS [4 PUNTOS]**
+
+### [0.5 PUNTOS] 1.1 Defina su directorio de trabajo. 
+```{r wd}
+#Se usa get para imprimir el directorio y luego set para definirlo
+setwd(getwd())
+print(setwd(getwd()))
+```
+
+### [0.5 PUNTOS] 1.2. Cargue la data "mRNA_expr.csv"
+```{r data}
+#Cargue la data "mRNA_expr.csv", ubicado en  data
+df <-read.csv(file = 'data/mRNA_expr.csv')
+head(df,5)
+```
+
+### [1 PUNTO] 1.3 Cree una función de nombre ```long_df``` para transformar la data ```df``` de la forma wide a long.
+
+```{r funcion_long}
+# Escriba la función long_df
+#Instalar  paquete
+#install.packages("tidyr")
+#La libreria tidyr para cargar melt
+library(tidyr)
+#Funcion de solucion
+long_df <- function(df){
+  #Se cambia el formato con ayuda de gather
+  data_long <- gather(df, gen, expresion_level, 3:9, factor_key=TRUE)
+  data_long
+}
+```
+
+
+### [1 PUNTO] 1.4 Genere la data ```df_long``` utilizandola función ```long_df```. 
+La tabla resultante tendrá tres columnas: ```dataset, gen, expresion_level```.  
+```{r df_long}
+# Genere  data df_long 
+# data anterior posee 4 columnas: bcr_patient_barcode, dataset, gen y expresion_level
+# Ultimos 3 elementos que son los de interes
+data_long_nueva<-long_df(df)[ , 2:4]
+#Se alamcenan los datos en un dataframe nuevo
+df_long <-data.frame(data_long_nueva)
+head(df_long,5)
+```
+
+### [0.5 PUNTOS] 1.5 A partir de la data ```df_long```, genere un **Descriptive table** (librería ```sjPlot```) y guárdelo en el subdirectorio "result"  con el nombre **mRNA_expr_summary.doc** (previamente debe seleccionar las celdas adecuadas con funciones de la librería ```dplyr``` en conjunto con el operador ```%>%```). 
+```{r desc_table}
+#código para crear el Descriptive table 
+#Librerias : dplyr 1.0.8, sjplot 2.8.10
+library(dplyr)
+library(sjPlot)
+library(sjmisc)
+#Extracion de las celdas
+descriptive_table0 <- df_long %>% group_by(dataset,
+                                           gen)
+#Descripcion de la data
+descriptive_tablef <- descr(x=descriptive_table0, 
+                            out="browser",
+                            file="results/mRNA_expr_summary.doc")
+descriptive_tablef
+```
+
+### [0.5 PUNTOS] 1.6 Interprete los resultados de la tabla resultante de la sección 1.5. 
+
+
+```{tex}
+# Escriba aquí su interpretación 
+# Intrepretación 
+#En base a la tabla descriptiva,  deduzco que el cancer con mayor incidencia 
+#es el BRCA. Presenta con mayor cantidad en el 
+#gen ESR1, con un promedio de 2.3. El segundo cancer comun es el
+#de OV con una incidencia de 561 observaciones y el gen con mayor presencia es FN1 con media 
+#de 1.33. Seguido el  cancer LUSC con 154 observaciones, KIPAN con 88 observaciones y UCEC con 54 observaciones.
+#Tuvieron mayor epresion en los genes: MUC1 con promedio de 0.56, PTEM con media de 0.72 
+#y ESR1 con un promedio de 2.17, respectivamente.Finalmente , el cancer KIRP fue el que tenia 
+#menos presencia (16 observaciones), con un alto nivel de expresión del gen PTEN.
+```
+
+
+
+## **Pregunta 2 VISUALIZACION DE DATOS  [5 PUNTOS]**
+
+# utilizar la data ```df_long```. 
+
+### [1 PUNTO] 2.1 Cree la funcion ```tcga_boxplots``` para visualizar boxplots y jitterplots. El único parámetro de la función es ```dataset```. La función debe crear un boxplot de los niveles de expresión para cada gen.
+
+```{r}
+# Código para crear  tcga_boxplots
+#Instalar  paquete
+#install.packages("ggplot2")
+#Libreria usada ggplot 3.3.5
+library(ggplot2)
+#Declaracion de la funcion con parametro dataset
+tcga_boxplots <- function(data){
+  #Asignacion apra la grafica
+  boxplots <- df_long %>% 
+              filter (dataset == data) %>% 
+              ggplot(aes(x=gen,
+                         y=expresion_level, 
+                         color = gen)) +
+              geom_boxplot(size=0.5) + 
+              geom_jitter (size=1)
+}
+```
+
+### [0.5 PUNTOS] 2.2 Utilizando la función ```lapply()``` genera la lista ```cancertype_boxplots``` con las gráficas para cada tipo de cancer (cada tipo de dataset). 
+```{r list_boxplots}
+# Código para generar la lista. 
+#Hacer una lista  para cada dataset y
+#Asiganar  un valor de un grafico
+# Se usa unique
+cancertype_boxplots_unicos <- unique(df_long$dataset)
+#Valores unicos un boxplot
+cancertype_boxplots <- lapply(cancertype_boxplots_unicos, 
+                              tcga_boxplots)
+cancertype_boxplots
+```
+
+### [0.5 PUNTOS] 2.3 Guarde en el subdirectorio ```result``` el tercer plot de la lista ```cancertype_boxplots``` con el nombre ```boxplot3.png```. La definición de a figura debe ser de 300dpi. 
+```{r boxplot3}
+# Código para guardar la tercera figura de la lista. 
+#Se elije el tercer grafico
+cancertype_boxplots_value <- cancertype_boxplots[[3]]
+cancertype_boxplots_value
+# Almacena
+ggsave("results/boxplot3.png",
+       dpi = 300,
+       limitsize = TRUE,)
+```
+
+
+### [1 PUNTO] 2.4 Escriba la función ```reg_gen_expression```, con el parámetro ```gen```. En este caso la función visualizará una gráfica de nube de puntos (geom_point) y una regresión por tipo de "dataset". La gráfica será de comparación de gen1 con gen2; por ejemplo en el eje "x" ```GATA3``` y en el eje "y"" ```FN1```.  
+
+```{r reg_gen_exp}
+# Función reg_gen_expression
+#Funcion para la expresion del gen
+reg_gen_expression <- function(cancertype_boxplots_value){
+  # Inicializan 2 variables con los valores del gen previo
+  gen_1 = cancertype_boxplots_value[1]
+  gen_2 = cancertype_boxplots_value[2]
+  
+  #Evaluar  probabilidad
+  filtro1 <- df_long %>%
+              filter (gen == gen_1) #Posible gen 1
+  filtro2 <- df_long %>% 
+              filter (gen == gen_2) #Posible gen 2
+  
+  #Añaden las multiples datas en una sola variable 
+  #analziar la regresion
+  nueva_data_con_genes <- cbind(filtro1,
+                                filtro2)
+  
+  #Se grafica usando tibble, para  modificar la dataframe
+  # install.packages ( "tidyverse" ),  instalado 1.3.1
+  reg_genplots_geom_point <- tibble("dataset" = nueva_data_con_genes[,1],
+                                    "gen1" = nueva_data_con_genes[,3],
+                                    "gen2" = nueva_data_con_genes[,6]) %>%
+                               ggplot(aes(x = gen1, 
+                                         y = gen2, 
+                                         color = dataset)) + 
+                              geom_point(size = 2) + 
+                              geom_smooth(method = lm, 
+                                          formula = y~x, 
+                                          se = FALSE)
+}
+```
+
+
+### [0.5 PUNTOS] 2.5. Utilizando la función ```lapply()``` genera la lista ```reg_genplots``` con las gráficas para cada par de genes posibles. Recuerde que tiene 7 tipos de genes, se debe tener todas las combinaciones posibles por pares de genes (combinatoria sin repetición).
+```{r list_regplots}
+# Código para generar la lista. 
+#Se hacen elementos unicos, para los genes
+#Se usa  codigo similar al anterior para ver combinaciones
+gen_unico <- unique(df_long$gen)
+#Se realizaran las combinaciones sin repeticion
+lista_genes_unicos <- combn(gen_unico,  #Gen a combinar
+                            m=2,        #Combinaciones
+                            simplify = FALSE)
+#Se genera la lsita con las graficas y las combinaciones posibles 
+reg_genplots <- lapply(lista_genes_unicos,
+                       reg_gen_expression)
+reg_genplots
+```
+
+
+### [0.5 PUNTOS] 2.6. Guarde en el subdirectorio ```result``` el onceavo plot de la lista ```reg_genplots``` con el nombre ```regresion11.pdf```. La definición de a figura debe ser de 300dpi. 
+```{r reg11}
+# Codigo para guardar el onceavo plot. 
+#Se elije el onceavo grafico
+reg_genplots_value <-reg_genplots[[11]]
+reg_genplots_value
+#Almacena y guarda
+ggsave("results/regresion11.pdf",
+       dpi = 300,
+       limitsize = TRUE,)
+```
+
+
+### [1 PUNTO] 2.7. Interprete los resultados de las figuras ```boxplot3.png``` y ```regresion11.pdf```.
+
+```{tex}
+
+#Intepretación
+1. Boxplot
+#La imagen Boxplot3.png, tiene una distribucion de puntos asimetricos, gran cantidad 
+#de valores atipicos.Se piensa que los datos no poseen una distribucion
+#normal, y provienen de un  proceso estocastio. Con mayor cantidad de 
+#punto negativos fue el GATA3, entre el quintil 1 y 2.El gen que se expreso con mayor cantidad de puntos positivos fue el ESR1, sin 
+#embargo es el quese extedio a lo largo del eje "nivel de expresion", correlacionandose
+#con analisis  previo.
+2. Regresión lineal
+#La grafica de regresion11.dpf, posee una densa nube de puntos, donde el nivel de expresion de
+#los genes 1 y 2 se concentraron aleatoriamente en la mayoria de canceres, 
+#pero con mas  frecuencia en los canceres BRCA y OV; Esta estrechamente 
+#relacionado al analsis previo. Finalmente la grafica indica  los niveles
+#de expresion del gen PTEN (gen1) aumenta, en coparacion  con el gen GAPDH.
+```
+
+## 3. CONTROL DE LA VERSIÓN [1 PUNTO]. Se verficará en ell repositorio de GitHub. 
